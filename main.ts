@@ -25,20 +25,21 @@ const handler = async(req:Request):Promise<Response> => {
       if(!book.titulo ||!book.autores || !book.copiasDisponibles){
         return new Response("El título y los autores son campos requeridos",{status:400});
       }
-      const bookdb =await autorescollection.find({_id:{$in:book.id}});//insertar book.id en bookcollection
+      const bookdb =await bookscollection.find({_id:{$in:book.id}});
       if(!bookdb) return new Response("Autores no exiten",{status:400}); 
       //comprobar que los autores existen
       const {insertedId} = await bookscollection.insertOne(
         {
           titulo: book.titulo,
           copiasDisponibles:book.copiasDisponibles,
-          autores: book.autores,
+          //autores: bookdb.map((b)=>ModelToAutor(b)),
+          autores:[],
         }
       );
       return new Response(JSON.stringify({
         id:insertedId,
         titulo: book.titulo,
-        autores: [],
+        autores: book.autores,
         copiasDisponibles:book.copiasDisponibles,
       }),{status:201});
     }
